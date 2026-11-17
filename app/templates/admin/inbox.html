@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ cfg.label }}{% endblock %}
+{% block heading %}{{ cfg.label }}{% endblock %}
+{% block actions %}<a class="btn btn-sm btn-primary" href="{{ url_for('admin.inbox_export', kind=kind) }}">Export CSV</a>{% endblock %}
+{% block content %}
+<div class="panel table-responsive">
+  <table class="table">
+    <thead><tr><th scope="col">Received</th><th scope="col">Contact</th>{% for attr, label in cfg.columns %}<th scope="col">{{ label }}</th>{% endfor %}<th scope="col">Status</th><th scope="col" class="text-end">Actions</th></tr></thead>
+    <tbody>
+      {% for item in items %}
+      <tr class="{{ '' if item.handled else 'table-warning' }}">
+        <td class="text-nowrap">{{ item.created_at|ist }}</td>
+        <td><strong>{{ item.name }}</strong><br><a href="tel:{{ item.phone }}">{{ item.phone }}</a><br><a href="mailto:{{ item.email }}">{{ item.email }}</a></td>
+        {% for attr, label in cfg.columns %}
+        <td class="{{ 'msg' if attr == 'message' }}">{% if attr == 'preferred_date' %}{{ item[attr]|datefmt }}{% else %}{{ item[attr] }}{% endif %}</td>
+        {% endfor %}
+        <td>{{ 'Handled' if item.handled else 'Open' }}</td>
+        <td class="text-end text-nowrap">
+          {% if kind == 'applications' and item.resume %}<a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.resume', item_id=item.id) }}">Resume</a>{% endif %}
+          <form class="inline-form" method="post" action="{{ url_for('admin.inbox_toggle', kind=kind, item_id=item.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-secondary" type="submit">{{ 'Reopen' if item.handled else 'Mark handled' }}</button>
+          </form>
+          <form class="inline-form" method="post" action="{{ url_for('admin.inbox_delete', kind=kind, item_id=item.id) }}" data-confirm="Delete this entry permanently?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ cfg.columns|length + 4 }}" class="text-muted">No entries yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

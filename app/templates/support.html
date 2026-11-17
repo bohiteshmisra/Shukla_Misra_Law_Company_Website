@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header, error_list, contact_fields, form_footer, service_select with context %}
+{% block content %}
+{{ page_header(page.title) }}
+<section class="section"><div class="container">
+  <div class="rich mb-4">{{ page.body_html|safe }}</div>
+
+  <h2 id="faqs">Frequently asked questions</h2>
+  <div class="accordion mb-5" id="faqList">
+    {% for f in faqs %}
+    <div class="accordion-item">
+      <h3 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{ f.id }}"
+                aria-expanded="false" aria-controls="faq{{ f.id }}">{{ f.question }}</button>
+      </h3>
+      <div id="faq{{ f.id }}" class="accordion-collapse collapse" data-bs-parent="#faqList">
+        <div class="accordion-body rich">{{ f.answer|safe }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="form-box" id="query">
+        <h2>Submit a query</h2>
+        {% set qf = form if which == 'query' else {} %}
+        {% if which == 'query' %}{{ error_list(errors) }}{% endif %}
+        <form method="post" action="{{ url_for('public.submit_query') }}#query">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          {{ contact_fields('q', qf) }}
+          <div class="mt-3">{{ service_select('q', qf) }}</div>
+          <div class="mt-3">
+            <label class="form-label" for="q-message">Your query <span class="req">*</span></label>
+            <textarea class="form-control" id="q-message" name="message" rows="4" maxlength="3000" required>{{ qf.get('message', '') }}</textarea>
+          </div>
+          {{ form_footer('q', captcha_query, 'Send query') }}
+        </form>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="form-box" id="appointment">
+        <h2>Request an appointment</h2>
+        {% set af = form if which == 'appointment' else {} %}
+        {% if which == 'appointment' %}{{ error_list(errors) }}{% endif %}
+        <form method="post" action="{{ url_for('public.submit_appointment') }}#appointment">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          {{ contact_fields('a', af) }}
+          <div class="row g-3 mt-0">
+            <div class="col-md-6">
+              <label class="form-label" for="a-date">Preferred date <span class="req">*</span></label>
+              <input class="form-control" id="a-date" name="preferred_date" type="date" min="{{ today }}" required value="{{ af.get('preferred_date', '') }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="a-time">Preferred time</label>
+              <select class="form-select" id="a-time" name="preferred_time">
+                {% for t in ['Any time', '11:00 AM – 1:00 PM', '1:00 PM – 4:00 PM', '4:00 PM – 7:00 PM'] %}
+                <option {{ 'selected' if af.get('preferred_time') == t }}>{{ t }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="mt-3">{{ service_select('a', af) }}</div>
+          <div class="mt-3">
+            <label class="form-label" for="a-message">Purpose of meeting</label>
+            <textarea class="form-control" id="a-message" name="message" rows="2" maxlength="3000">{{ af.get('message', '') }}</textarea>
+          </div>
+          {{ form_footer('a', captcha_appointment, 'Request appointment') }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div></section>
+{% endblock %}

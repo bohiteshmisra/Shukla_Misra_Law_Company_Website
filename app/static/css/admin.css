@@ -1,0 +1,29 @@
+/* Admin panel */
+body.admin { background: #f3f5f9; }
+.admin-shell { display: flex; min-height: 100vh; }
+.admin-side { flex: 0 0 240px; background: #0c1c37; color: #c9d2e3; padding: 1.2rem 0; }
+.admin-side .brand { display: block; padding: 0 1.2rem 1rem; color: #fff; font-family: Georgia, serif; font-size: 1.15rem; text-decoration: none; }
+.admin-side .brand small { display: block; font-family: "Segoe UI", system-ui, sans-serif; font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: #e3c88f; }
+.admin-side h2 { font-family: inherit; font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: #8e9bb5; margin: 1.1rem 1.2rem .3rem; }
+.admin-side a.item { display: flex; justify-content: space-between; padding: .4rem 1.2rem; color: #dfe5f1; text-decoration: none; font-size: .93rem; }
+.admin-side a.item:hover, .admin-side a.item.active { background: #12284c; color: #fff; }
+.admin-side a.item.active { box-shadow: inset 3px 0 0 #b0832f; }
+.admin-main { flex: 1; min-width: 0; padding: 1.5rem 2rem 3rem; }
+.admin-top { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.admin-top h1 { font-size: 1.6rem; margin: 0; }
+.panel { background: #fff; border: 1px solid #dfe4ec; border-radius: 4px; padding: 1.4rem; }
+.table { margin: 0; }
+.table td, .table th { vertical-align: middle; }
+.stat { display: block; background: #fff; border: 1px solid #dfe4ec; border-top: 3px solid #12284c; border-radius: 4px; padding: 1.1rem; text-decoration: none; color: inherit; }
+.stat strong { display: block; font-size: 2rem; font-family: Georgia, serif; color: #12284c; line-height: 1.1; }
+.inline-form { display: inline; }
+.msg { white-space: pre-line; max-width: 34rem; }
+.ql-container { min-height: 14rem; font-size: 1rem; background: #fff; }
+.ql-editor { min-height: 14rem; }
+.login-wrap { max-width: 400px; margin: 8vh auto; }
+.thumb { max-height: 80px; border-radius: 4px; border: 1px solid #dfe4ec; }
+@media (max-width: 767.98px) {
+  .admin-shell { flex-direction: column; }
+  .admin-side { flex: none; }
+  .admin-main { padding: 1rem; }
+}

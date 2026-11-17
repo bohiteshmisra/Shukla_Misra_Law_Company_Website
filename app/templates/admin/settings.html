@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% from "_macros.html" import error_list %}
+{% block title %}Firm details{% endblock %}
+{% block heading %}Firm details{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 900px">
+  {{ error_list(errors) }}
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3">
+      {% for key, label, kind in fields %}
+      <div class="{{ 'col-12' if kind == 'textarea' or key in ('address', 'map_embed_url', 'linkedin', 'hours') else 'col-md-6' }}">
+        <label class="form-label" for="{{ key }}">{{ label }}</label>
+        {% if kind == 'textarea' %}<textarea class="form-control" id="{{ key }}" name="{{ key }}" rows="5" maxlength="2000">{{ current[key] or '' }}</textarea>
+        {% else %}<input class="form-control" id="{{ key }}" name="{{ key }}" value="{{ current[key] or '' }}" maxlength="400">{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <p class="form-text mt-3">Blank fields (for example WhatsApp or email) are simply not shown on the website.</p>
+    <button class="btn btn-primary" type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

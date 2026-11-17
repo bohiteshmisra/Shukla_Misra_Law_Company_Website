@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header with context %}
+{% block content %}
+{{ page_header(page.title) }}
+<section class="section"><div class="container narrow">
+  {% if page.image %}<img class="img-fluid rounded mb-4" src="{{ url_for('public.media', kind='images', name=page.image) }}" alt="">{% endif %}
+  <div class="rich">{{ page.body_html|safe }}</div>
+</div></section>
+{% endblock %}

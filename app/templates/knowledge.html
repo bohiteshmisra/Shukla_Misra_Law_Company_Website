@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header with context %}
+{% block content %}
+{{ page_header(page.title) }}
+<section class="section"><div class="container">
+  <div class="rich mb-4">{{ page.body_html|safe }}</div>
+  <nav class="jump" aria-label="On this page">
+    <a href="#articles">Articles</a><a href="#calendar">Compliance calendar</a><a href="#links">Useful links</a><a href="#downloads">Downloads</a>
+  </nav>
+
+  <h2 id="articles">Articles and updates</h2>
+  <div class="row g-3 mb-5">
+    {% for a in articles %}
+    <div class="col-md-6">
+      <article class="update boxed">
+        <p class="meta">{{ a.published_at|ist('%d %b %Y') }} · {{ 'News update' if a.category == 'update' else 'Article' }}</p>
+        <h3><a href="{{ url_for('public.article', slug=a.slug) }}">{{ a.title }}</a></h3>
+        <p class="mb-0">{{ a.summary }}</p>
+      </article>
+    </div>
+    {% else %}<p class="text-muted">No articles published yet.</p>{% endfor %}
+  </div>
+
+  <h2 id="calendar">Tax and compliance calendar</h2>
+  {% if due_dates %}
+  <div class="table-responsive mb-2">
+    <table class="table align-middle">
+      <thead><tr><th scope="col">Due date</th><th scope="col">Compliance</th><th scope="col">Category</th></tr></thead>
+      <tbody>
+        {% for d in due_dates %}
+        <tr><td class="text-nowrap">{{ d.due_date|datefmt('%d %b %Y') }}</td>
+            <td>{{ d.title }}{% if d.description %}<br><span class="small text-muted">{{ d.description }}</span>{% endif %}</td>
+            <td>{{ d.category }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="small text-muted mb-5">Dates are indicative and may be extended or revised by the authorities.</p>
+  {% else %}<p class="text-muted mb-5">No upcoming dates listed.</p>{% endif %}
+
+  <h2 id="links">Useful links</h2>
+  <ul class="link-grid mb-5">
+    {% for l in links %}<li><a href="{{ l.url }}" target="_blank" rel="noopener noreferrer">{{ l.title }}</a></li>{% endfor %}
+  </ul>
+
+  <h2 id="downloads">Downloads</h2>
+  {% if downloads %}
+  <ul class="download-list">
+    {% for d in downloads %}
+    <li>
+      <div><strong>{{ d.title }}</strong>{% if d.category %} <span class="tag">{{ d.category }}</span>{% endif %}
+        {% if d.description %}<br><span class="small text-muted">{{ d.description }}</span>{% endif %}</div>
+      <a class="btn btn-sm btn-outline-primary" href="{{ url_for('public.media', kind='documents', name=d.filename) }}">Download {{ d.filename.rsplit('.', 1)[-1]|upper }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="text-muted">Forms and checklists will be added here.</p>{% endif %}
+</div></section>
+{% endblock %}

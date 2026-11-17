@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header with context %}
+{% block content %}
+{{ page_header(page.title) }}
+<section class="section"><div class="container">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-5">
+      <div class="rich mb-3">{{ page.body_html|safe }}</div>
+      <dl class="contact-list">
+        <dt>Office</dt>
+        <dd><address class="mb-0">{{ site.get('firm_name', '') }}<br>{{ site.get('address', '') }}<br>{{ site.get('city', '') }}, {{ site.get('state', '') }} {{ site.get('pincode', '') }}</address></dd>
+        {% if site.get('phone') %}<dt>Phone</dt><dd><a href="tel:{{ site.phone|replace(' ', '') }}">{{ site.phone }}</a></dd>{% endif %}
+        {% if site.get('email') %}<dt>Email</dt><dd><a href="mailto:{{ site.email }}">{{ site.email }}</a></dd>{% endif %}
+        {% if site.get('whatsapp') %}<dt>WhatsApp</dt><dd><a href="https://wa.me/{{ site.whatsapp|replace('+', '')|replace(' ', '') }}" rel="noopener">Chat on WhatsApp</a></dd>{% endif %}
+        <dt>Office hours</dt><dd>{{ site.get('hours', '') }}</dd>
+      </dl>
+      <a class="btn btn-primary" href="{{ url_for('public.support') }}#query">Send a query</a>
+      <a class="btn btn-outline-primary" href="{{ url_for('public.support') }}#appointment">Request an appointment</a>
+    </div>
+    <div class="col-lg-7">
+      {% if site.get('map_embed_url') %}
+      <div class="map"><iframe src="{{ site.map_embed_url }}" title="Map showing the office location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+      {% endif %}
+    </div>
+  </div>
+</div></section>
+{% endblock %}

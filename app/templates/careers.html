@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header, error_list, contact_fields, form_footer with context %}
+{% block content %}
+{{ page_header(page.title) }}
+<section class="section"><div class="container">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-6">
+      <div class="rich mb-4">{{ page.body_html|safe }}</div>
+      <h2>Current openings</h2>
+      {% for o in openings %}
+      <div class="opening">
+        <h3>{{ o.title }}</h3>
+        <p class="meta">{{ o.kind }} · {{ o.location }}</p>
+        <div class="rich">{{ o.body_html|safe }}</div>
+      </div>
+      {% else %}
+      <p class="text-muted">There are no openings listed at present. You may still share your profile using the form.</p>
+      {% endfor %}
+    </div>
+    <div class="col-lg-6">
+      <div class="form-box" id="apply">
+        <h2>Apply</h2>
+        {{ error_list(errors) }}
+        <form method="post" action="{{ url_for('public.apply') }}#apply" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          {{ contact_fields('c', form) }}
+          <div class="mt-3">
+            <label class="form-label" for="c-position">Position</label>
+            <select class="form-select" id="c-position" name="position">
+              <option value="General application">General application</option>
+              {% for o in openings %}<option value="{{ o.title }}" {{ 'selected' if form.get('position') == o.title }}>{{ o.title }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="mt-3">
+            <label class="form-label" for="c-message">About you</label>
+            <textarea class="form-control" id="c-message" name="message" rows="3" maxlength="3000">{{ form.get('message', '') }}</textarea>
+          </div>
+          <div class="mt-3">
+            <label class="form-label" for="c-resume">Resume (PDF, up to 2 MB) <span class="req">*</span></label>
+            <input class="form-control" id="c-resume" name="resume" type="file" accept="application/pdf,.pdf" required>
+          </div>
+          {{ form_footer('c', captcha, 'Submit application') }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div></section>
+{% endblock %}

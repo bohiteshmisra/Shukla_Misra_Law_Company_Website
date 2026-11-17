@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ res.label }}{% endblock %}
+{% block heading %}{{ res.label }}{% endblock %}
+{% block actions %}
+{% if res.get('can_create', True) %}<a class="btn btn-sm btn-primary" href="{{ url_for('admin.content_edit', name=name) }}">Add {{ res.singular }}</a>{% endif %}
+{% endblock %}
+{% block content %}
+<div class="panel table-responsive">
+  <table class="table">
+    <thead><tr>{% for attr, label in res.columns %}<th scope="col">{{ label }}</th>{% endfor %}<th scope="col" class="text-end">Actions</th></tr></thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        {% set is_first = loop.first %}{% set is_last = loop.last %}
+        {% for attr, label in res.columns %}
+        {% set v = item[attr] %}
+        <td>{% if v is boolean %}{{ 'Yes' if v else 'No' }}{% elif attr.endswith('_at') %}{{ v|ist('%d %b %Y') }}{% elif attr == 'due_date' %}{{ v|datefmt }}{% else %}{{ v }}{% endif %}</td>
+        {% endfor %}
+        <td class="text-end text-nowrap">
+          {% if res.get('sortable') %}
+          {% for direction, arrow in (('up', '↑'), ('down', '↓')) %}
+          <form class="inline-form" method="post" action="{{ url_for('admin.content_move', name=name, item_id=item.id, direction=direction) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-secondary" type="submit" aria-label="Move {{ direction }}" {{ 'disabled' if (direction == 'up' and is_first) or (direction == 'down' and is_last) }}>{{ arrow }}</button>
+          </form>
+          {% endfor %}
+          {% endif %}
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.content_edit', name=name, item_id=item.id) }}">Edit</a>
+          {% if res.get('can_delete', True) %}
+          <form class="inline-form" method="post" action="{{ url_for('admin.content_delete', name=name, item_id=item.id) }}" data-confirm="Delete this {{ res.singular }}? This cannot be undone.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ res.columns|length + 1 }}" class="text-muted">Nothing here yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

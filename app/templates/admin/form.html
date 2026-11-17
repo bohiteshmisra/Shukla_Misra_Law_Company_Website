@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% from "_macros.html" import error_list %}
+{% block title %}{{ 'Add' if is_new else 'Edit' }} {{ res.singular }}{% endblock %}
+{% block heading %}{{ 'Add' if is_new else 'Edit' }} {{ res.singular }}{% endblock %}
+{% block content %}
+<div class="panel" style="max-width: 900px">
+  {{ error_list(errors) }}
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% for f in res.fields %}
+    {% set stored = obj[f.name] %}
+    {% set posted = request.method == 'POST' %}
+    {% set value = request.form.get(f.name, '') if posted and f.kind not in ('bool', 'image', 'document') else stored %}
+    <div class="mb-3">
+      {% if f.kind == 'bool' %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="{{ f.name }}" name="{{ f.name }}" value="1" {{ 'checked' if (request.form.get(f.name) if posted else stored) }}>
+        <label class="form-check-label" for="{{ f.name }}">{{ f.label }}</label>
+      </div>
+      {% else %}
+      <label class="form-label" for="{{ f.name }}">{{ f.label }}{% if f.required %} <span class="req">*</span>{% endif %}</label>
+      {% if f.kind == 'textarea' %}
+      <textarea class="form-control" id="{{ f.name }}" name="{{ f.name }}" rows="3" maxlength="{{ f.max }}">{{ value or '' }}</textarea>
+      {% elif f.kind == 'richtext' %}
+      <textarea class="form-control" id="{{ f.name }}" name="{{ f.name }}" rows="10">{{ value or '' }}</textarea>
+      <div data-editor="{{ f.name }}"></div>
+      {% elif f.kind == 'select' %}
+      <select class="form-select" id="{{ f.name }}" name="{{ f.name }}">
+        {% for val, label in f.choices %}<option value="{{ val }}" {{ 'selected' if value == val }}>{{ label }}</option>{% endfor %}
+      </select>
+      {% elif f.kind == 'date' %}
+      <input class="form-control" type="date" id="{{ f.name }}" name="{{ f.name }}" value="{{ value if value is string else (value.isoformat() if value else '') }}" {{ 'required' if f.required }}>
+      {% elif f.kind == 'datetime' %}
+      <input class="form-control" type="datetime-local" id="{{ f.name }}" name="{{ f.name }}" value="{{ value if value is string else ((value + IST).strftime('%Y-%m-%dT%H:%M') if value else '') }}">
+      {% elif f.kind in ('image', 'document') %}
+      {% if stored %}
+      <div class="mb-2">
+        {% if f.kind == 'image' %}<img class="thumb" src="{{ url_for('public.media', kind='images', name=stored) }}" alt="Current image">
+        {% else %}<span class="text-muted">A file is already uploaded. Choose a new one to replace it.</span>{% endif %}
+        {% if not f.required %}
+        <div class="form-check mt-1"><input class="form-check-input" type="checkbox" id="{{ f.name }}_remove" name="{{ f.name }}_remove" value="1">
+          <label class="form-check-label" for="{{ f.name }}_remove">Remove current file</label></div>
+        {% endif %}
+      </div>
+      {% endif %}
+      <input class="form-control" type="file" id="{{ f.name }}" name="{{ f.name }}">
+      {% else %}
+      <input class="form-control" type="{{ 'url' if f.kind == 'url' else 'text' }}" id="{{ f.name }}" name="{{ f.name }}" value="{{ value or '' }}" maxlength="{{ f.max }}" {{ 'required' if f.required }}>
+      {% endif %}
+      {% if f.help %}<div class="form-text">{{ f.help }}</div>{% endif %}
+      {% endif %}
+    </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-link" href="{{ url_for('admin.content_list', name=name) }}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

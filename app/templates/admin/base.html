@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}Admin{% endblock %} | {{ site.get('firm_name', 'Website') }}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/quill.snow.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin">
+{% block shell %}
+<div class="admin-shell">
+  <nav class="admin-side" aria-label="Admin navigation">
+    <a class="brand" href="{{ url_for('admin.dashboard') }}">{{ site.get('firm_name', '') }}<small>Website admin</small></a>
+    {% set path = request.path %}
+    <a class="item {{ 'active' if request.endpoint == 'admin.dashboard' }}" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+    <h2>Content</h2>
+    {% for key, res in admin_resources.items() %}
+    {% set href = url_for('admin.content_list', name=key) %}
+    <a class="item {{ 'active' if path.startswith(href) }}" href="{{ href }}">{{ res.label }}</a>
+    {% endfor %}
+    <h2>Inbox</h2>
+    {% for key, cfg in admin_inbox.items() %}
+    {% set href = url_for('admin.inbox_list', kind=key) %}
+    <a class="item {{ 'active' if path.startswith(href) }}" href="{{ href }}">{{ cfg.label }}</a>
+    {% endfor %}
+    <h2>Site</h2>
+    <a class="item {{ 'active' if request.endpoint == 'admin.settings' }}" href="{{ url_for('admin.settings') }}">Firm details</a>
+    <a class="item {{ 'active' if request.endpoint == 'admin.audit_log' }}" href="{{ url_for('admin.audit_log') }}">Audit log</a>
+    <a class="item {{ 'active' if request.endpoint == 'admin.change_password' }}" href="{{ url_for('admin.change_password') }}">Change password</a>
+    <a class="item" href="{{ url_for('public.home') }}" target="_blank" rel="noopener">View website</a>
+  </nav>
+  <div class="admin-main">
+    <div class="admin-top">
+      <h1>{% block heading %}{% endblock %}</h1>
+      <div class="d-flex gap-2 align-items-center">
+        {% block actions %}{% endblock %}
+        <form class="inline-form" method="post" action="{{ url_for('admin.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-outline-secondary" type="submit">Sign out ({{ current_user.username }})</button>
+        </form>
+      </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}<div class="alert alert-{{ category }}" role="status">{{ message }}</div>{% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}
+<script src="{{ url_for('static', filename='vendor/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/quill.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

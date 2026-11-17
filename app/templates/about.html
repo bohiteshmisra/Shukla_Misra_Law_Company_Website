@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header with context %}
+{% block content %}
+{{ page_header(page.title) }}
+<section class="section"><div class="container">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      {% if page.image %}<img class="img-fluid rounded mb-4" src="{{ url_for('public.media', kind='images', name=page.image) }}" alt="">{% endif %}
+      <div class="rich">{{ page.body_html|safe }}</div>
+    </div>
+    <aside class="col-lg-4">
+      <div class="info-box">
+        <h2>Firm details</h2>
+        <dl class="mb-0">
+          <dt>Name</dt><dd>{{ site.get('firm_name', '') }}, {{ site.get('tagline', '') }}</dd>
+          {% if site.get('frn') %}<dt>Firm Registration No.</dt><dd>{{ site.frn }}</dd>{% endif %}
+          {% if site.get('established') %}<dt>Established</dt><dd>{{ site.established }}</dd>{% endif %}
+          <dt>Office</dt><dd>{{ site.get('address', '') }}, {{ site.get('city', '') }}, {{ site.get('state', '') }} {{ site.get('pincode', '') }}</dd>
+          <dt>Hours</dt><dd>{{ site.get('hours', '') }}</dd>
+        </dl>
+      </div>
+    </aside>
+  </div>
+  {% if team %}
+  <h2 class="mt-5 mb-3">Partners and team</h2>
+  <div class="row g-3">
+    {% for m in team %}
+    <div class="col-md-6">
+      <div class="profile">
+        {% if m.image %}<img src="{{ url_for('public.media', kind='images', name=m.image) }}" alt="Photo of {{ m.name }}">{% endif %}
+        <div>
+          <h3>{{ m.name }}</h3>
+          <p class="meta">{{ [m.designation, m.qualifications]|select|join(' · ') }}</p>
+          {% if m.membership_no %}<p class="meta">ICAI Membership No. {{ m.membership_no }}</p>{% endif %}
+          {% if m.bio %}<p class="mb-0 bio">{{ m.bio }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div></section>
+{% endblock %}

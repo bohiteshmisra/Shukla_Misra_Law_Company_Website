@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header with context %}
+{% block content %}
+{{ page_header(article.title, ('Knowledge Centre', url_for('public.knowledge'))) }}
+<section class="section"><div class="container narrow">
+  <p class="meta">{{ article.published_at|ist('%d %b %Y') }}</p>
+  {% if article.image %}<img class="img-fluid rounded mb-4" src="{{ url_for('public.media', kind='images', name=article.image) }}" alt="">{% endif %}
+  <div class="rich">{{ article.body_html|safe }}</div>
+  <p class="small text-muted mt-4">This article is for general information only and is not professional advice.</p>
+</div></section>
+{% endblock %}

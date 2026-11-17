@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <p class="eyebrow">{{ site.get('tagline', '') }} · {{ site.get('city', '') }}</p>
+    <h1>{{ page.title }}</h1>
+    <div class="hero-text rich">{{ page.body_html|safe }}</div>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <a class="btn btn-accent" href="{{ url_for('public.services') }}">View services</a>
+      <a class="btn btn-outline-light" href="{{ url_for('public.support') }}#appointment">Request an appointment</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Services</h2>
+      <a href="{{ url_for('public.services') }}">All services</a>
+    </div>
+    <div class="row g-3">
+      {% for s in services[:9] %}
+      <div class="col-md-6 col-lg-4">
+        <a class="card-link" href="{{ url_for('public.service_detail', slug=s.slug) }}">
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.summary }}</p>
+          <span class="more">Read more</span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="row g-4 g-lg-5">
+      <div class="col-lg-6">
+        <div class="section-head">
+          <h2>Upcoming due dates</h2>
+          <a href="{{ url_for('public.knowledge') }}#calendar">Full calendar</a>
+        </div>
+        {% if due_dates %}
+        <ul class="due-list">
+          {% for d in due_dates %}
+          <li>
+            <span class="due-date"><strong>{{ d.due_date.strftime('%d') }}</strong>{{ d.due_date.strftime('%b') }}</span>
+            <span><span class="due-title">{{ d.title }}</span>{% if d.category %}<span class="tag">{{ d.category }}</span>{% endif %}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <p class="small text-muted mb-0">Dates are indicative and may be extended or revised. Please confirm on the official portal.</p>
+        {% else %}<p class="text-muted">No upcoming dates listed.</p>{% endif %}
+      </div>
+      <div class="col-lg-6">
+        <div class="section-head">
+          <h2>Latest updates</h2>
+          <a href="{{ url_for('public.knowledge') }}">Knowledge Centre</a>
+        </div>
+        {% for a in articles %}
+        <article class="update">
+          <p class="meta">{{ a.published_at|ist('%d %b %Y') }}</p>
+          <h3><a href="{{ url_for('public.article', slug=a.slug) }}">{{ a.title }}</a></h3>
+          <p>{{ a.summary }}</p>
+        </article>
+        {% else %}<p class="text-muted">No updates published yet.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-strip">
+  <div class="container d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+      <h2>Visit or call the office</h2>
+      <p class="mb-0">{{ site.get('address', '') }}, {{ site.get('city', '') }} {{ site.get('pincode', '') }} · {{ site.get('hours', '') }}</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      {% if site.get('phone') %}<a class="btn btn-accent" href="tel:{{ site.phone|replace(' ', '') }}">{{ site.phone }}</a>{% endif %}
+      <a class="btn btn-outline-light" href="{{ url_for('public.contact') }}">Contact details</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

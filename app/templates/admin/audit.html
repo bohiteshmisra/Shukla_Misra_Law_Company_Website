@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block heading %}Audit log{% endblock %}
+{% block content %}
+<div class="panel table-responsive">
+  <table class="table table-sm">
+    <thead><tr><th scope="col">When (IST)</th><th scope="col">User</th><th scope="col">Action</th><th scope="col">Detail</th><th scope="col">IP address</th></tr></thead>
+    <tbody>
+      {% for e in entries %}<tr><td class="text-nowrap">{{ e.created_at|ist }}</td><td>{{ e.username }}</td><td>{{ e.action|replace('_', ' ') }}</td><td>{{ e.detail }}</td><td>{{ e.ip }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+  <p class="form-text mb-0">Showing the latest 500 entries.</p>
+</div>
+{% endblock %}

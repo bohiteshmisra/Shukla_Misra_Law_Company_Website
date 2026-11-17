@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  {% for key, cfg in admin_inbox.items() %}
+  <div class="col-md-4"><a class="stat" href="{{ url_for('admin.inbox_list', kind=key) }}"><strong>{{ counts[key] }}</strong>Open {{ cfg.label|lower }}</a></div>
+  {% endfor %}
+</div>
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="panel">
+      <h2 class="h5">Recent activity</h2>
+      <table class="table table-sm">
+        <tbody>
+          {% for e in recent %}<tr><td class="text-nowrap text-muted">{{ e.created_at|ist('%d %b, %I:%M %p') }}</td><td>{{ e.username }}</td><td>{{ e.action|replace('_', ' ') }}</td><td>{{ e.detail }}</td></tr>{% endfor %}
+        </tbody>
+      </table>
+      <a href="{{ url_for('admin.audit_log') }}">Full audit log</a>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="panel">
+      <h2 class="h5">Database backup</h2>
+      <p class="text-muted">Download a copy of the website database (content, enquiries and settings). Uploaded files are stored separately in the <code>uploads</code> folder.</p>
+      <form method="post" action="{{ url_for('admin.backup') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary" type="submit">Download backup</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import page_header with context %}
+{% block content %}
+{{ page_header(service.title, ('Services', url_for('public.services'))) }}
+<section class="section"><div class="container">
+  <div class="row g-4 g-lg-5">
+    <div class="col-lg-8">
+      {% if service.image %}<img class="img-fluid rounded mb-4" src="{{ url_for('public.media', kind='images', name=service.image) }}" alt="">{% endif %}
+      {% if service.summary %}<p class="lead">{{ service.summary }}</p>{% endif %}
+      <div class="rich">{{ service.body_html|safe }}</div>
+      <p class="mt-4"><a class="btn btn-primary" href="{{ url_for('public.support') }}#query">Send a query about this service</a></p>
+    </div>
+    <aside class="col-lg-4">
+      <div class="info-box">
+        <h2>All services</h2>
+        <ul class="list-unstyled side-list mb-0">
+          {% for s in nav_services %}
+          <li><a class="{{ 'current' if s.id == service.id }}" href="{{ url_for('public.service_detail', slug=s.slug) }}">{{ s.title }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div></section>
+{% endblock %}
